@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyNest — Your Learning Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+  <link rel="icon" href="./images/study logo.jfif">
+
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────── */
+    :root {
+      --bg-deep:      #080d17;
+      --bg-dark:      #0d1526;
+      --bg-card:      rgba(255,255,255,0.035);
+      --bg-card-hov:  rgba(255,255,255,0.07);
+      --border:       rgba(255,255,255,0.08);
+      --border-hov:   rgba(100,220,255,0.35);
+      --cyan:         #38e1ff;
+      --cyan-dim:     #1ab8d8;
+      --blue:         #4f8eff;
+      --blue-dim:     #2c5ccc;
+      --text-primary: #e8f0ff;
+      --text-muted:   #7a90b8;
+      --text-dim:     #4a5f82;
+      --grad-btn:     linear-gradient(135deg,#38e1ff 0%,#4f8eff 100%);
+      --grad-heading: linear-gradient(120deg,#ffffff 0%,#38e1ff 50%,#4f8eff 100%);
+      --shadow-card:  0 8px 40px rgba(0,0,0,0.55);
+      --shadow-glow:  0 0 40px rgba(56,225,255,0.12);
+      --radius:       16px;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --max-w:        1180px;
+    }
+
+    /* ─── RESET ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── PRELOADER ──────────────────────────────────── */
+    #preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg-deep);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 24px;
+      animation: preloader-hide 0.6s ease 2.8s forwards;
+    }
+    @keyframes preloader-hide {
+      to { opacity: 0; visibility: hidden; pointer-events: none; }
+    }
+
+    .preloader-logo {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 800;
+      background: var(--grad-heading);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: logo-pulse 1.4s ease-in-out infinite alternate;
+    }
+    @keyframes logo-pulse {
+      from { opacity: 0.5; transform: scale(0.97); }
+      to   { opacity: 1;   transform: scale(1.03); }
+    }
+
+    .preloader-sub {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.06em;
+      animation: fadeUp 0.8s ease 0.3s both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── HEADER / NAV ──────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    }
+    header nav {
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      background: rgba(8,13,23,0.82);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.35rem;
+      background: var(--grad-heading);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links {
+      display: flex; gap: 32px; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.03em;
+      transition: color 0.25s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0; height: 2px;
+      background: var(--grad-btn);
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      border-radius: 2px;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    /* hide nav links on mobile */
+    @media (max-width: 640px) { header nav .nav-links { display: none; } }
+
+    /* ─── SHARED LAYOUT ──────────────────────────────── */
+    .container {
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    section { padding: 90px 0; }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      background: rgba(56,225,255,0.08);
+      border: 1px solid rgba(56,225,255,0.2);
+      border-radius: 999px;
+      padding: 4px 14px;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.18;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+    }
+    .section-desc {
+      max-width: 560px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    /* ─── HERO ───────────────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      display: flex; align-items: center;
+      padding-top: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Animated grid background */
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(56,225,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,225,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      animation: grid-drift 18s linear infinite;
+    }
+    @keyframes grid-drift {
+      to { background-position: 48px 48px; }
+    }
+    /* Radial glow */
+    #hero::after {
+      content: '';
+      position: absolute;
+      top: -10%; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(79,142,255,0.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 740px;
+    }
+    .hero-eyebrow {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 22px;
+      display: flex; align-items: center; gap: 10px;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hero-eyebrow span { width: 32px; height: 1px; background: var(--cyan); }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.6rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+    .hero-title .grad {
+      background: var(--grad-heading);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-tagline {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      color: var(--text-muted);
+      max-width: 520px;
+      margin-bottom: 40px;
+      line-height: 1.75;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+
+    .hero-cta {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      animation: fadeUp 0.7s ease 0.4s both;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--grad-btn);
+      color: #060d1a;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+      box-shadow: 0 4px 24px rgba(56,225,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 36px rgba(56,225,255,0.45);
+      filter: brightness(1.08);
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 14px 28px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.25s, color 0.25s, transform 0.25s;
+    }
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    /* Floating badges */
+    .hero-badges {
+      margin-top: 52px;
+      display: flex; flex-wrap: wrap; gap: 10px;
+      animation: fadeUp 0.7s ease 0.5s both;
+    }
+    .hero-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 14px;
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .hero-badge:hover { border-color: var(--cyan-dim); color: var(--cyan); }
+
+    /* ─── ABOUT ──────────────────────────────────────── */
+    #about { background: var(--bg-dark); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      align-items: center;
+    }
+    @media (min-width: 768px) {
+      .about-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .about-visual {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .about-stat {
+      display: flex; align-items: center; gap: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 22px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .about-stat:hover {
+      border-color: var(--border-hov);
+      transform: translateX(6px);
+      box-shadow: var(--shadow-glow);
+    }
+    .stat-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: rgba(56,225,255,0.1);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2px; }
+    .stat-value { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+
+    /* ─── CARDS (PROJECTS) ───────────────────────────── */
+    #projects {}
+    .projects-header { margin-bottom: 48px; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    @media (min-width: 600px)  { .cards-grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1000px) { .cards-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    /* details/summary accordion card */
+    details.card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+      box-shadow: var(--shadow-card);
+    }
+    details.card:hover {
+      border-color: var(--border-hov);
+      box-shadow: var(--shadow-glow), var(--shadow-card);
+      transform: translateY(-4px);
+    }
+    details.card[open] {
+      border-color: rgba(56,225,255,0.4);
+      box-shadow: 0 0 48px rgba(56,225,255,0.15), var(--shadow-card);
+    }
+
+    details.card > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 26px 24px;
+      outline: none;
+    }
+    details.card > summary::-webkit-details-marker { display: none; }
+
+    .card-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 18px;
+    }
+    .icon-blue   { background: rgba(79,142,255,0.15); }
+    .icon-cyan   { background: rgba(56,225,255,0.12); }
+    .icon-green  { background: rgba(56,255,160,0.12); }
+    .icon-orange { background: rgba(255,160,56,0.12); }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+    .card-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+
+    .card-toggle {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.25s, transform 0.35s;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    details.card[open] .card-toggle {
+      transform: rotate(45deg);
+      background: rgba(56,225,255,0.15);
+      border-color: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    .card-body {
+      padding: 0 24px 26px;
+      animation: expand-in 0.35s ease both;
+    }
+    @keyframes expand-in {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* roadmap timeline */
+    .roadmap-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .roadmap-list li {
+      display: flex; align-items: center; gap: 14px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      transition: border-color 0.25s;
+    }
+    .roadmap-list li:hover { border-color: var(--cyan-dim); color: var(--text-primary); }
+    .roadmap-num {
+      width: 24px; height: 24px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--grad-btn);
+      color: #060d1a;
+      font-weight: 700;
+      font-size: 0.72rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* resource links */
+    .resource-links { display: flex; flex-direction: column; gap: 8px; }
+    .resource-link {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px;
+      transition: border-color 0.25s, color 0.25s, transform 0.2s;
+    }
+    .resource-link:hover {
+      border-color: var(--cyan-dim);
+      color: var(--cyan);
+      transform: translateX(4px);
+    }
+    .resource-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--grad-btn); flex-shrink: 0;
+    }
+
+    /* tips */
+    .tips-list { display: flex; flex-direction: column; gap: 8px; }
+    .tip-item {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.03);
+      border-left: 2px solid var(--cyan-dim);
+      border-radius: 0 10px 10px 0;
+      padding: 9px 14px;
+      transition: background 0.25s, color 0.25s;
+    }
+    .tip-item:hover { background: rgba(56,225,255,0.05); color: var(--text-primary); }
+
+    /* website buttons */
+    .website-links { display: flex; flex-direction: column; gap: 8px; }
+    .web-btn {
+      display: inline-flex; align-items: center; justify-content: space-between;
+      font-size: 0.87rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      background: rgba(79,142,255,0.07);
+      border: 1px solid rgba(79,142,255,0.2);
+      border-radius: 10px;
+      padding: 9px 14px;
+      transition: border-color 0.25s, color 0.25s, background 0.25s, transform 0.2s;
+    }
+    .web-btn:hover {
+      border-color: var(--blue);
+      color: #9ac4ff;
+      background: rgba(79,142,255,0.14);
+      transform: translateX(4px);
+    }
+
+    /* ─── SKILLS ─────────────────────────────────────── */
+    #skills { background: var(--bg-dark); }
+    .skills-grid {
+      display: flex; flex-wrap: wrap; gap: 16px;
+      margin-top: 40px;
+    }
+    .skill-card {
+      flex: 1 1 140px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      text-align: center;
+      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .skill-card:hover {
+      border-color: var(--border-hov);
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-glow);
+    }
+    .skill-emoji {
+      font-size: 2rem;
+      width: 56px; height: 56px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .skill-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .skill-tag {
+      font-size: 0.7rem;
+      color: var(--cyan);
+      background: rgba(56,225,255,0.09);
+      border: 1px solid rgba(56,225,255,0.18);
+      border-radius: 999px;
+      padding: 2px 10px;
+      letter-spacing: 0.06em;
+    }
+    .skill-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .skill-bar-fill {
+      height: 100%;
+      background: var(--grad-btn);
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    /* ─── CONTACT ────────────────────────────────────── */
+    #contact {}
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    @media (min-width: 768px) {
+      .contact-grid { grid-template-columns: 1fr 1.4fr; }
+    }
+
+    .contact-info {
+      display: flex; flex-direction: column; gap: 18px;
+    }
+    .contact-point {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      transition: border-color 0.25s;
+    }
+    .contact-point:hover { border-color: var(--border-hov); }
+    .contact-ico { font-size: 1.2rem; }
+    .contact-label { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 2px; }
+    .contact-val { font-size: 0.9rem; font-weight: 500; }
+
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px 32px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-card);
+    }
+    .form-row { display: flex; gap: 16px; flex-direction: column; }
+    @media (min-width: 480px) { .form-row { flex-direction: row; } }
+
+    .form-group {
+      display: flex; flex-direction: column; gap: 8px;
+      flex: 1;
+    }
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .form-group input,
+    .form-group textarea {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+      resize: none;
+      width: 100%;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: var(--text-dim); }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--cyan-dim);
+      background: rgba(56,225,255,0.04);
+      box-shadow: 0 0 0 3px rgba(56,225,255,0.1);
+    }
+    .form-submit {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--grad-btn);
+      color: #060d1a;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      padding: 14px 36px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.25s, box-shadow 0.25s, filter 0.25s;
+      box-shadow: 0 4px 24px rgba(56,225,255,0.28);
+      margin-top: 8px;
+    }
+    .form-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 36px rgba(56,225,255,0.42);
+      filter: brightness(1.08);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      background: var(--bg-dark);
+      border-top: 1px solid var(--border);
+      padding: 56px 0 36px;
+    }
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .footer-top {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    @media (min-width: 640px) {
+      .footer-top { flex-direction: row; justify-content: space-between; align-items: flex-start; }
+    }
+    .footer-brand {}
+    .footer-logo {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.4rem;
+      background: var(--grad-heading);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .footer-motto { font-size: 0.88rem; color: var(--text-muted); }
+    .footer-nav {
+      display: flex; gap: 24px; flex-wrap: wrap;
+    }
+    .footer-nav a {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      transition: color 0.25s;
+      position: relative;
+    }
+    .footer-nav a:hover { color: var(--cyan); }
+
+    .footer-divider {
+      width: 100%; height: 1px;
+      background: var(--border);
+      margin-bottom: 24px;
+    }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy { font-size: 0.8rem; color: var(--text-dim); }
+    .footer-hearts { font-size: 0.8rem; color: var(--text-dim); }
+    .footer-hearts span { color: #ff6b8a; }
+
+    /* ─── SCROLL REVEAL BASE ─────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      animation: revealAnim 0.7s ease forwards;
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    @keyframes revealAnim {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── DIVIDER WAVE ───────────────────────────────── */
+    .wave-divider {
+      width: 100%; overflow: hidden; line-height: 0;
+      height: 40px; position: relative;
+    }
+    .wave-divider svg { width: 100%; height: 100%; }
+
+    /* ─── UTILITY ────────────────────────────────────── */
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ PRELOADER ══════════════════════════════════ -->
+  <div id="preloader" aria-hidden="true">
+    <div class="preloader-logo">StudyNest</div>
+    <div class="preloader-sub">Loading your StudyNest&hellip;</div>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- ══ HEADER / NAV ══════════════════════════════ -->
+  <header>
+    <nav role="navigation" aria-label="Main navigation">
+      <div class="nav-inner">
+        <a href="#hero" class="nav-logo">StudyNest</a>
+        <ul class="nav-links">
+          <li><a href="#hero">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ══ HERO ═══════════════════════════════════════ -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span></span>
+          Student-first Learning Hub
+        </div>
+
+        <h1 class="hero-title">
+          <span class="grad">StudyNest</span>
+        </h1>
+
+        <p class="hero-tagline">
+          Your organized hub for programming roadmaps, study tips, and learning resources.
+        </p>
+
+        <div class="hero-cta">
+          <a href="#projects" class="btn-primary">Start Learning ↗</a>
+          <a href="#about" class="btn-ghost">Learn more</a>
+        </div>
+
+        <div class="hero-badges">
+          <span class="hero-badge">📚 Structured Roadmaps</span>
+          <span class="hero-badge">🛠 Dev Tools</span>
+          <span class="hero-badge">🎯 Study Tips</span>
+          <span class="hero-badge">🔗 Curated Links</span>
+          <span class="hero-badge">💡 Project Ideas</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ABOUT ══════════════════════════════════════ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <span class="section-tag">About StudyNest</span>
+          <h2 class="section-title">Learning should be simple,<br>not scattered.</h2>
+          <p class="section-desc">
+            Students constantly jump between dozens of tabs searching for roadmaps, tutorials, and tools. StudyNest brings everything into one clean, structured hub — so you can focus on learning, not searching.
+          </p>
+          <p class="section-desc mt-24">
+            Whether you're just starting out or leveling up, StudyNest gives you the direction, resources, and confidence to grow as a developer.
+          </p>
+        </div>
+
+        <div class="about-visual">
+          <div class="about-stat">
+            <div class="stat-icon">📖</div>
+            <div>
+              <div class="stat-label">Curated Content</div>
+              <div class="stat-value">Structured roadmaps for every stage</div>
+            </div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-icon">🔗</div>
+            <div>
+              <div class="stat-label">Free Resources</div>
+              <div class="stat-value">Top platforms, zero cost to you</div>
+            </div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-icon">🎯</div>
+            <div>
+              <div class="stat-label">Study Strategies</div>
+              <div class="stat-value">Proven tips that actually work</div>
+            </div>
+          </div>
+          <div class="about-stat">
+            <div class="stat-icon">⚡</div>
+            <div>
+              <div class="stat-label">Always Growing</div>
+              <div class="stat-value">New resources added regularly</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PROJECTS / RESOURCES ═══════════════════════ -->
+  <section id="projects">
+    <div class="container">
+      <div class="projects-header">
+        <span class="section-tag">Learning Resources</span>
+        <h2 class="section-title">Everything you need to grow.</h2>
+        <p class="section-desc">Click any card to expand and explore what's inside.</p>
+      </div>
+
+      <div class="cards-grid">
+
+        <!-- Card 1: Roadmap -->
+        <details class="card">
+          <summary>
+            <div class="card-header">
+              <div></div>
+              <div class="card-toggle">+</div>
+            </div>
+            <div class="card-icon icon-blue">🗺️</div>
+            <div class="card-title">Programming Roadmap</div>
+            <div class="card-desc">A step-by-step learning path from zero to confident developer.</div>
+          </summary>
+          <div class="card-body">
+            <ul class="roadmap-list">
+              <li><span class="roadmap-num">1</span> Learn HTML — Structure the web</li>
+              <li><span class="roadmap-num">2</span> Learn CSS — Style & layout</li>
+              <li><span class="roadmap-num">3</span> Learn JavaScript — Make it interactive</li>
+              <li><span class="roadmap-num">4</span> Learn Git &amp; GitHub — Version control</li>
+              <li><span class="roadmap-num">5</span> Build Real Projects — Apply everything</li>
+            </ul>
+          </div>
+        </details>
+
+        <!-- Card 2: Resources -->
+        <details class="card">
+          <summary>
+            <div class="card-header">
+              <div></div>
+              <div class="card-toggle">+</div>
+            </div>
+            <div class="card-icon icon-cyan">📚</div>
+            <div class="card-title">Free Learning Resources</div>
+            <div class="card-desc">Handpicked platforms that offer world-class content for free.</div>
+          </summary>
+          <div class="card-body">
+            <div class="resource-links">
+              <a href="https://www.freecodecamp.org" target="_blank" rel="noopener" class="resource-link">
+                <span class="resource-dot"></span> freeCodeCamp
+              </a>
+              <a href="https://www.w3schools.com" target="_blank" rel="noopener" class="resource-link">
+                <span class="resource-dot"></span> W3Schools
+              </a>
+              <a href="https://developer.mozilla.org" target="_blank" rel="noopener" class="resource-link">
+                <span class="resource-dot"></span> MDN Web Docs
+              </a>
+              <a href="https://www.coursera.org" target="_blank" rel="noopener" class="resource-link">
+                <span class="resource-dot"></span> Coursera
+              </a>
+              <a href="https://www.khanacademy.org" target="_blank" rel="noopener" class="resource-link">
+                <span class="resource-dot"></span> Khan Academy
+              </a>
+            </div>
+          </div>
+        </details>
+
+        <!-- Card 3: Study Tips -->
+        <details class="card">
+          <summary>
+            <div class="card-header">
+              <div></div>
+              <div class="card-toggle">+</div>
+            </div>
+            <div class="card-icon icon-green">💡</div>
+            <div class="card-title">Study Tips</div>
+            <div class="card-desc">Science-backed habits that make learning stick faster.</div>
+          </summary>
+          <div class="card-body">
+            <div class="tips-list">
+              <div class="tip-item">⏱ Study in focused 25-minute sessions (Pomodoro)</div>
+              <div class="tip-item">📝 Take notes while you learn — don't just read</div>
+              <div class="tip-item">🛠 Practice by building small projects</div>
+              <div class="tip-item">🔁 Review concepts regularly — spaced repetition works</div>
+              <div class="tip-item">🚫 Avoid multitasking — deep focus beats busy work</div>
+            </div>
+          </div>
+        </details>
+
+        <!-- Card 4: Useful Websites -->
+        <details class="card">
+          <summary>
+            <div class="card-header">
+              <div></div>
+              <div class="card-toggle">+</div>
+            </div>
+            <div class="card-icon icon-orange">🌐</div>
+            <div class="card-title">Useful Websites</div>
+            <div class="card-desc">Essential developer tools and communities you should bookmark.</div>
+          </summary>
+          <div class="card-body">
+            <div class="website-links">
+              <a href="https://github.com" target="_blank" rel="noopener" class="web-btn">
+                <span>🐙 GitHub</span><span>↗</span>
+              </a>
+              <a href="https://stackoverflow.com" target="_blank" rel="noopener" class="web-btn">
+                <span>💬 Stack Overflow</span><span>↗</span>
+              </a>
+              <a href="https://codepen.io" target="_blank" rel="noopener" class="web-btn">
+                <span>✏️ CodePen</span><span>↗</span>
+              </a>
+              <a href="https://devdocs.io" target="_blank" rel="noopener" class="web-btn">
+                <span>📄 DevDocs</span><span>↗</span>
+              </a>
+              <a href="https://roadmap.sh" target="_blank" rel="noopener" class="web-btn">
+                <span>🗺 Roadmap.sh</span><span>↗</span>
+              </a>
+            </div>
+          </div>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SKILLS ═════════════════════════════════════ -->
+  <section id="skills">
+    <div class="container">
+      <span class="section-tag">Skills to Learn</span>
+      <h2 class="section-title">Start building your toolkit.</h2>
+      <p class="section-desc">These are the core skills every modern developer needs. Pick one and start today.</p>
+
+      <div class="skills-grid">
+
+        <div class="skill-card">
+          <div class="skill-emoji">🌐</div>
+          <div class="skill-name">HTML</div>
+          <div class="skill-tag">Foundation</div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:95%"></div></div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-emoji">🎨</div>
+          <div class="skill-name">CSS</div>
+          <div class="skill-tag">Styling</div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:88%"></div></div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-emoji">⚡</div>
+          <div class="skill-name">JavaScript</div>
+          <div class="skill-tag">Logic</div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:80%"></div></div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-emoji">🐙</div>
+          <div class="skill-name">Git &amp; GitHub</div>
+          <div class="skill-tag">Version Control</div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:75%"></div></div>
+        </div>
+
+        <div class="skill-card">
+          <div class="skill-emoji">🧠</div>
+          <div class="skill-name">Prog. Logic</div>
+          <div class="skill-tag">Problem Solving</div>
+          <div class="skill-bar-track"><div class="skill-bar-fill" style="width:70%"></div></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ════════════════════════════════════ -->
+  <section id="contact">
+    <div class="container">
+      <span class="section-tag">Get in Touch</span>
+      <h2 class="section-title">We'd love to hear from you.</h2>
+      <p class="section-desc">Have a suggestion, resource to share, or just want to say hello? Drop us a message.</p>
+
+      <div class="contact-grid mt-32">
+        <div class="contact-info">
+          <div class="contact-point">
+            <div class="contact-ico">📧</div>
+            <div>
+              <div class="contact-label">Email</div>
+              <div class="contact-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b0d8d5dcdcdff0c3c4c5d4c9ded5c3c49ed4d5c6">[email&#160;protected]</a></div>
+            </div>
+          </div>
+          <div class="contact-point">
+            <div class="contact-ico">🐙</div>
+            <div>
+              <div class="contact-label">GitHub</div>
+              <div class="contact-val">github.com/studynest</div>
+            </div>
+          </div>
+          <div class="contact-point">
+            <div class="contact-ico">💬</div>
+            <div>
+              <div class="contact-label">Community</div>
+              <div class="contact-val">Join our Discord</div>
+            </div>
+          </div>
+          <div class="contact-point">
+            <div class="contact-ico">🕐</div>
+            <div>
+              <div class="contact-label">Response Time</div>
+              <div class="contact-val">Usually within 24 hours</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <form action="#" method="post">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="fname">First Name</label>
+                <input type="text" id="fname" name="fname" placeholder="Alex" autocomplete="given-name" />
+              </div>
+              <div class="form-group">
+                <label for="lname">Last Name</label>
+                <input type="text" id="lname" name="lname" placeholder="Rivera" autocomplete="family-name" />
+              </div>
+            </div>
+
+            <div class="form-group mt-16">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" placeholder="alex@example.com" autocomplete="email" />
+            </div>
+
+            <div class="form-group mt-16">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" rows="5" placeholder="Tell us what's on your mind..."></textarea>
+            </div>
+
+            <button type="submit" class="form-submit mt-16">
+              Send Message ✉️
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ═════════════════════════════════════ -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">StudyNest</div>
+          <div class="footer-motto">Helping students learn smarter.</div>
+        </div>
+        <nav class="footer-nav" aria-label="Footer navigation">
+          <a href="#hero">Home</a>
+          <a href="#about">About</a>
+          <a href="#projects">Projects</a>
+          <a href="#skills">Skills</a>
+          <a href="#contact">Contact</a>
+        </nav>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        <div class="footer-copy">© 2026 StudyNest. All rights reserved.</div>
+        <div class="foo
